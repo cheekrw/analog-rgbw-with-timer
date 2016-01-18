@@ -90,16 +90,11 @@ void setup() {
   analogWrite(BLUEPIN, b);
   analogWrite(WHITEPIN, w);
 
-
-
-//  SPI.begin();
-
    //-------- sunrise sunset stuff ------
 
   tardis.TimeZone(-5 * 60); // tell TimeLord what timezone your RTC is synchronized to. You can ignore DST
   // as long as the RTC never changes back and forth between DST and non-DST
   tardis.Position(LATITUDE, LONGITUDE); // tell TimeLord where in the world we are
-
   
      //--------RTC SETUP ------------
     Wire.begin();
@@ -130,7 +125,7 @@ void setup() {
     //--------COUNTER 1 SETUP -------
     TCCR1B = (TCCR1B & 0b11111000) | 0x03; //sets T1 (PWM pins 9 & 10) to standard internal clock 
     //setupTimer1ForCounting((int)PWM_COUNT); // sets T1 to use external clock e.g. from RTC 
-    printTimer1Info();   
+//    printTimer1Info();   
 
 }
 
@@ -141,12 +136,13 @@ void loop() {
 //  deck_light();
 //  work_light();
 //  rgb();
-//  set_string(brown2);
+//  set_string(rose);
 //  christmas();
 //  halloween();
 //  july4th();
 
- times_up = true;  // set to false if want to skip auto timing stuff
+ times_up = true;   // set to false if want to skip auto timing stuff
+                    // need to figure out how to use an inerrupt on T1 for this
 
   if(times_up) {
 
@@ -162,24 +158,35 @@ void loop() {
     int morning_off_hour = today[tl_hour] + 1;
     int morning_off_minute = today[tl_minute];
 
-    if (now.hour() <= morning_off_hour
+    if (now.hour() <= 5
+        &&
+        now.minute() <= 30)     
+        {fadeto(night, intensity);} // color from midnight to 5:30am
+    else if (now.hour() <= morning_off_hour
         &&
         now.minute() <= morning_off_minute)     
-        {fadeto(night, intensity);}
+        {fadeto(morning, intensity);} // color from 5:30am to 1 hour past sunrise
     else if (now.hour() <= evening_on_hour
         &&
         now.minute() <= evening_on_minute)
-        {fadeto(off, 0);}
-    else (fadeto(evening, intensity))
+        {fadeto(off, 0);} // color from 1 hour past sunrise to 1 hour before sunset
+    else (fadeto(evening, intensity)) // color from 1 hour before sunset to midnight
       ;
 /*
-    Serial.println(evening_on_hour);
+    Serial.print("Evening on ");
+    Serial.print(evening_on_hour);
+    Serial.print(":");
     Serial.println(evening_on_minute);
-    Serial.println(morning_off_hour);
+    Serial.print("Morning off ");
+    Serial.print(morning_off_hour);
+    Serial.print(":");
     Serial.println(morning_off_minute);
-    Serial.println(now.hour());
+    Serial.print("current time ");
+    Serial.print(now.hour());
+    Serial.print(":");
     Serial.println(now.minute());
-*/    
+    Serial.println();
+/*    
     
 /*  RTC.forceTempConv(true);  //DS3231 does this every 64 seconds, we are simply testing the function here
     int16_t temp_word = RTC.getTempAsWord();
@@ -211,7 +218,7 @@ void loop() {
   }
 
     times_up = false;
-    delay(5000);
+    delay(300000);
 
 }
 
