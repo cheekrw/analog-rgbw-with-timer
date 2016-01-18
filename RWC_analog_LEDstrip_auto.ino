@@ -5,7 +5,6 @@
 // and TimeLord stuff calculates sunrise and sunset times for each day
 
 #include <Wire.h>
-#include <SPI.h>
 #include <RTClib.h>
 #include <RTC_DS3231.h>
 #include <TimeLord.h>
@@ -14,12 +13,12 @@ TimeLord tardis;
 RTC_DS3231 RTC;
 
 // easier to reference here...see .h file for more options
-//#define SQW_FREQ DS3231_SQW_FREQ_1      //  0b00000000  1Hz
-#define SQW_FREQ DS3231_SQW_FREQ_1024     //0b00001000   1024Hz
+#define SQW_FREQ DS3231_SQW_FREQ_1      //  0b00000000  1Hz
+//#define SQW_FREQ DS3231_SQW_FREQ_1024     //0b00001000   1024Hz
 //#define SQW_FREQ DS3231_SQW_FREQ_4096  // 0b00010000   4096Hz
 //#define SQW_FREQ DS3231_SQW_FREQ_8192 //0b00011000      8192Hz
 
-#define PWM_COUNT 61439  // one minute at 1024 Hz = 61440
+#define PWM_COUNT 300  // one minute at 1024 Hz = 61440
 
 #define RTC_SQW_IN 5     // input square wave from RTC into T1 pin (D5)
                                //WE USE TIMER1 so that it does not interfere with Arduino delay() command
@@ -48,7 +47,7 @@ const int GREENPIN = 10;
 const int BLUEPIN = 11;
 const int WHITEPIN = 3;
 byte r = 0, g = 0, b = 0, w = 0,
-     intensity = 50;  // 100 is max
+     intensity = 100;  // 100 is max
 
 unsigned long msec_tgt = 1000;  // make this higher to slow down
 
@@ -77,7 +76,7 @@ unsigned long msec_tgt = 1000;  // make this higher to slow down
 //####################################################################################
 void setup() {
 
-//  Serial.begin(57600);
+  Serial.begin(57600);
 
   pinMode(RTC_SQW_IN, INPUT);
   
@@ -91,14 +90,11 @@ void setup() {
   analogWrite(BLUEPIN, b);
   analogWrite(WHITEPIN, w);
 
-  SPI.begin();
-
    //-------- sunrise sunset stuff ------
 
   tardis.TimeZone(-5 * 60); // tell TimeLord what timezone your RTC is synchronized to. You can ignore DST
   // as long as the RTC never changes back and forth between DST and non-DST
   tardis.Position(LATITUDE, LONGITUDE); // tell TimeLord where in the world we are
-
   
      //--------RTC SETUP ------------
     Wire.begin();
@@ -118,7 +114,7 @@ void setup() {
     }
     
     RTC.enable32kHz(false);
-    RTC.SQWEnable(true);//  enable output to the SQW pin, but not during battery operation (saves battery)
+    RTC.SQWEnable(false);//  enable output to the SQW pin, but not during battery operation (saves battery)
     RTC.BBSQWEnable(false);// enable output to the SQW pin, even during battery operation  
     RTC.SQWFrequency( SQW_FREQ );
   
@@ -126,17 +122,10 @@ void setup() {
     //RTC.getControlRegisterData( datastr[0]  );
     //Serial.print(  datastr );
  
-  
-  
-    //--------INT 0---------------
-    EICRA = 0;      //clear it
-    EICRA |= (1 << ISC01);
-    EICRA |= (1 << ISC00);   //ISC0[1:0] = 0b11  rising edge INT0 creates interrupt
-    EIMSK |= (1 << INT0);    //enable INT0 interrupt
-        
     //--------COUNTER 1 SETUP -------
-    setupTimer1ForCounting((int)PWM_COUNT); 
-    //printTimer1Info();   
+    TCCR1B = (TCCR1B & 0b11111000) | 0x03; //sets T1 (PWM pins 9 & 10) to standard internal clock 
+    //setupTimer1ForCounting((int)PWM_COUNT); // sets T1 to use external clock e.g. from RTC 
+//    printTimer1Info();   
 
 }
 
@@ -147,12 +136,13 @@ void loop() {
 //  deck_light();
 //  work_light();
 //  rgb();
-  set_string(night);
+//  set_string(rose);
 //  christmas();
 //  halloween();
 //  july4th();
 
- times_up = false;  // set to false if want to skip auto timing stuff
+ times_up = true;   // set to false if want to skip auto timing stuff
+                    // need to figure out how to use an inerrupt on T1 for this
 
   if(times_up) {
 
@@ -168,24 +158,35 @@ void loop() {
     int morning_off_hour = today[tl_hour] + 1;
     int morning_off_minute = today[tl_minute];
 
-    if (now.hour() <= morning_off_hour
+    if (now.hour() <= 5
+        &&
+        now.minute() <= 30)     
+        {fadeto(night, intensity);} // color from midnight to 5:30am
+    else if (now.hour() <= morning_off_hour
         &&
         now.minute() <= morning_off_minute)     
-        {set_string(night);}
+        {fadeto(morning, intensity);} // color from 5:30am to 1 hour past sunrise
     else if (now.hour() <= evening_on_hour
         &&
         now.minute() <= evening_on_minute)
-        {set_string(off);}
-    else (set_string(evening))
+        {fadeto(off, 0);} // color from 1 hour past sunrise to 1 hour before sunset
+    else (fadeto(evening, intensity)) // color from 1 hour before sunset to midnight
       ;
 /*
-    Serial.println(evening_on_hour);
+    Serial.print("Evening on ");
+    Serial.print(evening_on_hour);
+    Serial.print(":");
     Serial.println(evening_on_minute);
-    Serial.println(morning_off_hour);
+    Serial.print("Morning off ");
+    Serial.print(morning_off_hour);
+    Serial.print(":");
     Serial.println(morning_off_minute);
-    Serial.println(now.hour());
+    Serial.print("current time ");
+    Serial.print(now.hour());
+    Serial.print(":");
     Serial.println(now.minute());
-*/    
+    Serial.println();
+/*    
     
 /*  RTC.forceTempConv(true);  //DS3231 does this every 64 seconds, we are simply testing the function here
     int16_t temp_word = RTC.getTempAsWord();
@@ -217,7 +218,7 @@ void loop() {
   }
 
     times_up = false;
-
+    delay(300000);
 
 }
 
