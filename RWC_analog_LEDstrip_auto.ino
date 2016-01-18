@@ -76,7 +76,7 @@ unsigned long msec_tgt = 1000;  // make this higher to slow down
 //####################################################################################
 void setup() {
 
-  Serial.begin(57600);
+//  Serial.begin(57600);
 
   pinMode(RTC_SQW_IN, INPUT);
   
