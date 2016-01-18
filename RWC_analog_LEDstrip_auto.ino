@@ -53,7 +53,7 @@ byte r = 0, g = 0, b = 0, w = 0,
 unsigned long msec_tgt = 1000;  // make this higher to slow down
 
 #define evening      0,   0,   0,  75
-#define night        0,   0,  1,   0
+#define night        0,   0,  10,   0
 #define morning      0,   0,   0, 100
 #define white_full 255, 147,  25, 255
 #define white        0,   0,   0, 255
