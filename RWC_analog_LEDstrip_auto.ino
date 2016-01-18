@@ -5,7 +5,7 @@
 // and TimeLord stuff calculates sunrise and sunset times for each day
 
 #include <Wire.h>
-#include <SPI.h>
+//#include <SPI.h>
 #include <RTClib.h>
 #include <RTC_DS3231.h>
 #include <TimeLord.h>
@@ -14,12 +14,12 @@ TimeLord tardis;
 RTC_DS3231 RTC;
 
 // easier to reference here...see .h file for more options
-//#define SQW_FREQ DS3231_SQW_FREQ_1      //  0b00000000  1Hz
-#define SQW_FREQ DS3231_SQW_FREQ_1024     //0b00001000   1024Hz
+#define SQW_FREQ DS3231_SQW_FREQ_1      //  0b00000000  1Hz
+//#define SQW_FREQ DS3231_SQW_FREQ_1024     //0b00001000   1024Hz
 //#define SQW_FREQ DS3231_SQW_FREQ_4096  // 0b00010000   4096Hz
 //#define SQW_FREQ DS3231_SQW_FREQ_8192 //0b00011000      8192Hz
 
-#define PWM_COUNT 61439  // one minute at 1024 Hz = 61440
+#define PWM_COUNT 300  // one minute at 1024 Hz = 61440
 
 #define RTC_SQW_IN 5     // input square wave from RTC into T1 pin (D5)
                                //WE USE TIMER1 so that it does not interfere with Arduino delay() command
@@ -48,7 +48,7 @@ const int GREENPIN = 10;
 const int BLUEPIN = 11;
 const int WHITEPIN = 3;
 byte r = 0, g = 0, b = 0, w = 0,
-     intensity = 50;  // 100 is max
+     intensity = 100;  // 100 is max
 
 unsigned long msec_tgt = 1000;  // make this higher to slow down
 
@@ -91,7 +91,9 @@ void setup() {
   analogWrite(BLUEPIN, b);
   analogWrite(WHITEPIN, w);
 
-  SPI.begin();
+
+
+//  SPI.begin();
 
    //-------- sunrise sunset stuff ------
 
@@ -127,7 +129,7 @@ void setup() {
     //Serial.print(  datastr );
  
   
-  
+
     //--------INT 0---------------
     EICRA = 0;      //clear it
     EICRA |= (1 << ISC01);
@@ -146,8 +148,8 @@ void setup() {
 void loop() {
 //  deck_light();
 //  work_light();
-//  rgb();
-  set_string(night);
+  rgb();
+//  set_string(night);
 //  christmas();
 //  halloween();
 //  july4th();
