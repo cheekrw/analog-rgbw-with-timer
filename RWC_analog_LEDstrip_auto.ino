@@ -76,7 +76,7 @@ unsigned long msec_tgt = 1000;  // make this higher to slow down
 //####################################################################################
 void setup() {
 
-//  Serial.begin(57600);
+  Serial.begin(57600);
 
   pinMode(RTC_SQW_IN, INPUT);
   
@@ -172,26 +172,22 @@ void loop() {
         {fadeto(off, 0);} // color from 1 hour past sunrise to 1 hour before sunset
     else (fadeto(evening, intensity)) // color from 1 hour before sunset to midnight
       ;
-/*
-    Serial.print("Evening on ");
-    Serial.print(evening_on_hour);
-    Serial.print(":");
-    Serial.println(evening_on_minute);
+//*
     Serial.print("Morning off ");
     Serial.print(morning_off_hour);
     Serial.print(":");
     Serial.println(morning_off_minute);
-    Serial.print("current time ");
-    Serial.print(now.hour());
+    Serial.print("Evening on ");
+    Serial.print(evening_on_hour);
     Serial.print(":");
-    Serial.println(now.minute());
-    Serial.println();
-/*    
+    Serial.println(evening_on_minute);
+//*    
     
-/*  RTC.forceTempConv(true);  //DS3231 does this every 64 seconds, we are simply testing the function here
+//*  RTC.forceTempConv(true);  //DS3231 does this every 64 seconds, we are simply testing the function here
     int16_t temp_word = RTC.getTempAsWord();
     int8_t temp_hbyte = temp_word >> 8;
     
+    Serial.print("current time ");
     Serial.print(now.year(), DEC);
     Serial.print('/');
     Serial.print(now.month(), DEC);
@@ -214,7 +210,7 @@ void loop() {
     
     Serial.println();
 
-*/
+//*/
   }
 
     times_up = false;
