@@ -5,7 +5,6 @@
 // and TimeLord stuff calculates sunrise and sunset times for each day
 
 #include <Wire.h>
-//#include <SPI.h>
 #include <RTClib.h>
 #include <RTC_DS3231.h>
 #include <TimeLord.h>
@@ -77,7 +76,7 @@ unsigned long msec_tgt = 1000;  // make this higher to slow down
 //####################################################################################
 void setup() {
 
-//  Serial.begin(57600);
+  Serial.begin(57600);
 
   pinMode(RTC_SQW_IN, INPUT);
   
@@ -120,7 +119,7 @@ void setup() {
     }
     
     RTC.enable32kHz(false);
-    RTC.SQWEnable(true);//  enable output to the SQW pin, but not during battery operation (saves battery)
+    RTC.SQWEnable(false);//  enable output to the SQW pin, but not during battery operation (saves battery)
     RTC.BBSQWEnable(false);// enable output to the SQW pin, even during battery operation  
     RTC.SQWFrequency( SQW_FREQ );
   
@@ -128,17 +127,10 @@ void setup() {
     //RTC.getControlRegisterData( datastr[0]  );
     //Serial.print(  datastr );
  
-  
-
-    //--------INT 0---------------
-    EICRA = 0;      //clear it
-    EICRA |= (1 << ISC01);
-    EICRA |= (1 << ISC00);   //ISC0[1:0] = 0b11  rising edge INT0 creates interrupt
-    EIMSK |= (1 << INT0);    //enable INT0 interrupt
-        
     //--------COUNTER 1 SETUP -------
-    setupTimer1ForCounting((int)PWM_COUNT); 
-    //printTimer1Info();   
+    TCCR1B = (TCCR1B & 0b11111000) | 0x03; //sets T1 (PWM pins 9 & 10) to standard internal clock 
+    //setupTimer1ForCounting((int)PWM_COUNT); // sets T1 to use external clock e.g. from RTC 
+    printTimer1Info();   
 
 }
 
@@ -148,13 +140,13 @@ void setup() {
 void loop() {
 //  deck_light();
 //  work_light();
-  rgb();
-//  set_string(night);
+//  rgb();
+//  set_string(brown2);
 //  christmas();
 //  halloween();
 //  july4th();
 
- times_up = false;  // set to false if want to skip auto timing stuff
+ times_up = true;  // set to false if want to skip auto timing stuff
 
   if(times_up) {
 
@@ -173,12 +165,12 @@ void loop() {
     if (now.hour() <= morning_off_hour
         &&
         now.minute() <= morning_off_minute)     
-        {set_string(night);}
+        {fadeto(night, intensity);}
     else if (now.hour() <= evening_on_hour
         &&
         now.minute() <= evening_on_minute)
-        {set_string(off);}
-    else (set_string(evening))
+        {fadeto(off, 0);}
+    else (fadeto(evening, intensity))
       ;
 /*
     Serial.println(evening_on_hour);
@@ -219,7 +211,7 @@ void loop() {
   }
 
     times_up = false;
-
+    delay(5000);
 
 }
 
