@@ -138,7 +138,7 @@ void loop() {
 //  deck_light();
 //  work_light();
 //  rgb();
-//  set_string(52, 148, 209, 0);
+//  set_string(evening);
 //  christmas();
 //  halloween();
 //  july4th();
@@ -162,13 +162,13 @@ void loop() {
     int SunRiseMinute = today[tl_minute];
     int SunRiseMinuteOfDay = SunRiseHour * 60 + SunRiseMinute;
 
-    int NowMinute = now.hour() * 60 + now.hour();
+    int NowMinute = now.hour() * 60 + now.minute();
 
     int WakeMinute = 5 * 60 + 30; // 5:30 AM
         // Morning ends 30 minutes past sunrise, which may be before I wake.
-    int MorningEndMinute = SunRiseMinuteOfDay + 30;
+    int MorningEndMinute = SunRiseMinuteOfDay + 60;
         // Day ends 30 minutes before sunset 
-    int DayEndMinute = SunSetMinuteOfDay - 30;
+    int DayEndMinute = SunSetMinuteOfDay - 60;
     
 
     if (NowMinute <= WakeMinute && NowMinute <= MorningEndMinute) 
