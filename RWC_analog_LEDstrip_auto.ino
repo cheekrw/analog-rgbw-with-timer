@@ -138,12 +138,12 @@ void loop() {
 //  deck_light();
 //  work_light();
 //  rgb();
-  set_string(52, 148, 209, 0);
+//  set_string(52, 148, 209, 0);
 //  christmas();
 //  halloween();
 //  july4th();
 
- times_up = false;   // set to false if want to skip auto timing stuff
+ times_up = true;   // set to false if want to skip auto timing stuff
                     // need to figure out how to use an inerrupt on T1 for this
 
   if(times_up) {
@@ -154,36 +154,45 @@ void loop() {
     byte today[] = {0, 0, 12, now.day(), now.month(), now.year()};
 
     tardis.SunSet(today);
-    int evening_on_hour = today[tl_hour] - 1;
-    int evening_on_minute = today[tl_minute];
+    int SunSetHour = today[tl_hour];
+    int SunSetMinute = today[tl_minute];
+    int SunSetMinuteOfDay = SunSetHour * 60 + SunSetMinute;
     tardis.SunRise(today);
-    int morning_off_hour = today[tl_hour] + 1;
-    int morning_off_minute = today[tl_minute];
+    int SunRiseHour = today[tl_hour];
+    int SunRiseMinute = today[tl_minute];
+    int SunRiseMinuteOfDay = SunRiseHour * 60 + SunRiseMinute;
 
-    if (now.hour() <= 5
-        &&
-        now.minute() <= 30)     
-        {fadeto(night, intensity);} // color from midnight to 5:30am
-    else if (now.hour() <= morning_off_hour
-        &&
-        now.minute() <= morning_off_minute)     
-        {fadeto(ice_blue, intensity);} // color from 5:30am to 1 hour past sunrise
-    else if (now.hour() <= evening_on_hour
-        &&
-        now.minute() <= evening_on_minute)
-        {fadeto(off, 0);} // color from 1 hour past sunrise to 1 hour before sunset
+    int NowMinute = now.hour() * 60 + now.hour();
+
+    int WakeMinute = 5 * 60 + 30; // 5:30 AM
+        // Morning ends 30 minutes past sunrise, which may be before I wake.
+    int MorningEndMinute = SunRiseMinuteOfDay + 30;
+        // Day ends 30 minutes before sunset 
+    int DayEndMinute = SunSetMinuteOfDay - 30;
+    
+
+    if (NowMinute <= WakeMinute && NowMinute <= MorningEndMinute) 
+        {fadeto(night, intensity);} // color in the very early morning
+    else if (NowMinute > WakeMinute && NowMinute <= MorningEndMinute)     
+        {fadeto(ice_blue, intensity);} // color I wake to, if I wake before sunrise
+    else if (NowMinute > MorningEndMinute && NowMinute <= DayEndMinute)
+        {fadeto(off, 0);} // color during daylight hours
     else (fadeto(evening, intensity)) // color from 1 hour before sunset to midnight
       ;
 //*
-    Serial.print("Morning off ");
-    Serial.print(morning_off_hour);
+    Serial.print("Wake Time ");
+    Serial.print(int(WakeMinute / 60));
     Serial.print(":");
-    Serial.println(morning_off_minute);
-    Serial.print("Evening on ");
-    Serial.print(evening_on_hour);
+    Serial.println(WakeMinute % 60);
+    Serial.print("Morning End ");
+    Serial.print(int(MorningEndMinute / 60));
     Serial.print(":");
-    Serial.println(evening_on_minute);
-//*    
+    Serial.println(MorningEndMinute % 60);
+    Serial.print("Day End ");
+    Serial.print(int(DayEndMinute / 60));
+    Serial.print(":");
+    Serial.println(DayEndMinute % 60);
+//*/
     
 //*  RTC.forceTempConv(true);  //DS3231 does this every 64 seconds, we are simply testing the function here
     int16_t temp_word = RTC.getTempAsWord();
@@ -209,14 +218,12 @@ void loop() {
     Serial.println("_F");
     
     Serial.println();
-    
-    Serial.println();
 
 //*/
   }
 
     times_up = false;
-    delay(300000);
+    delay(60000);
 
 }
 
