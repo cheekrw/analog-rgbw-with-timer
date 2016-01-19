@@ -63,7 +63,7 @@ unsigned long msec_tgt = 1000;  // make this higher to slow down
 #define green        0, 255,   0,   0
 #define blue         0,   0, 255,   0
 #define light_blue  10,  10, 255,  40
-#define rose       147,  42,  42,   0 // lots of strobe
+#define rose       150,  42,  42,   0 // lots of strobe
 #define purple     200,   0, 255,   0
 #define brown2     139,  69,  19,   0
 #define brown3     139,  80,  14,   0
@@ -136,12 +136,12 @@ void loop() {
 //  deck_light();
 //  work_light();
 //  rgb();
-//  set_string(rose);
+  set_string(rose);
 //  christmas();
 //  halloween();
 //  july4th();
 
- times_up = true;   // set to false if want to skip auto timing stuff
+ times_up = false;   // set to false if want to skip auto timing stuff
                     // need to figure out how to use an inerrupt on T1 for this
 
   if(times_up) {
