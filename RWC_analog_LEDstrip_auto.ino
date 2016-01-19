@@ -63,6 +63,7 @@ unsigned long msec_tgt = 1000;  // make this higher to slow down
 #define green        0, 255,   0,   0
 #define blue         0,   0, 255,   0
 #define light_blue  10,  10, 255,  40
+#define ice_blue    52, 148, 209,   0
 #define rose       147,  42,  42,   0 // lots of strobe
 #define purple     200,   0, 255,   0
 #define brown2     139,  69,  19,   0
@@ -70,6 +71,7 @@ unsigned long msec_tgt = 1000;  // make this higher to slow down
 #define orange     250,  40,   0,   0
 #define yellow     255, 150,   0,   0
 #define off          0,   0,   0,   0
+
 
 //####################################################################################
 // SETUP
@@ -136,12 +138,12 @@ void loop() {
 //  deck_light();
 //  work_light();
 //  rgb();
-//  set_string(rose);
+  set_string(52, 148, 209, 0);
 //  christmas();
 //  halloween();
 //  july4th();
 
- times_up = true;   // set to false if want to skip auto timing stuff
+ times_up = false;   // set to false if want to skip auto timing stuff
                     // need to figure out how to use an inerrupt on T1 for this
 
   if(times_up) {
@@ -165,7 +167,7 @@ void loop() {
     else if (now.hour() <= morning_off_hour
         &&
         now.minute() <= morning_off_minute)     
-        {fadeto(morning, intensity);} // color from 5:30am to 1 hour past sunrise
+        {fadeto(ice_blue, intensity);} // color from 5:30am to 1 hour past sunrise
     else if (now.hour() <= evening_on_hour
         &&
         now.minute() <= evening_on_minute)
@@ -295,7 +297,7 @@ void  halloween () {
   fadeto(orange, 100);
   delay(5000);
 */
-  set_string(orange);
+    set_string(orange);
   }
 
 void july4th() {
