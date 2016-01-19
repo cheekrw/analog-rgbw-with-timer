@@ -23,8 +23,8 @@ RTC_DS3231 RTC;
 #define RTC_SQW_IN 5     // input square wave from RTC into T1 pin (D5)
                                //WE USE TIMER1 so that it does not interfere with Arduino delay() command
 
-float const LONGITUDE = -73.6918716;
-float const LATITUDE = 41.3368530;
+float const LONGITUDE = -73.69;
+float const LATITUDE = 41.34;
 
 //----------- GLOBALS  -------------------------
   volatile bool times_up = false;
