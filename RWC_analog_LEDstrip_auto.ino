@@ -64,6 +64,7 @@ unsigned long msec_tgt = 1000;  // make this higher to slow down
 #define blue         0,   0, 255,   0
 #define light_blue  10,  10, 255,  40
 #define ice_blue    52, 148, 209,   0
+#define nice_blue    0,  90, 135,  27
 #define rose       147,  42,  42,   0 // lots of strobe
 #define purple     200,   0, 255,   0
 #define brown2     139,  69,  19,   0
@@ -173,9 +174,9 @@ void loop() {
 
     if (NowMinute <= WakeMinute && NowMinute <= MorningEndMinute) 
         {fadeto(night, intensity);} // color in the very early morning
-    else if (NowMinute > WakeMinute && NowMinute <= MorningEndMinute)     
-        {fadeto(ice_blue, intensity);} // color I wake to, if I wake before sunrise
-    else if (NowMinute > MorningEndMinute && NowMinute <= DayEndMinute)
+    else if (NowMinute >= WakeMinute && NowMinute <= MorningEndMinute)     
+        {fadeto(nice_blue, intensity);} // color I wake to, if I wake before sunrise
+    else if (NowMinute >= MorningEndMinute && NowMinute <= DayEndMinute)
         {fadeto(off, 0);} // color during daylight hours
     else (fadeto(evening, intensity)) // color from 1 hour before sunset to midnight
       ;
@@ -192,7 +193,7 @@ void loop() {
     Serial.print(int(DayEndMinute / 60));
     Serial.print(":");
     Serial.println(DayEndMinute % 60);
-//*/
+//*
     
 //*  RTC.forceTempConv(true);  //DS3231 does this every 64 seconds, we are simply testing the function here
     int16_t temp_word = RTC.getTempAsWord();
@@ -218,7 +219,6 @@ void loop() {
     Serial.println("_F");
     
     Serial.println();
-
 //*/
   }
 
