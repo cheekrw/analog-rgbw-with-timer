@@ -1,3 +1,4 @@
+
 //####################################################################################
 /* Setup the RTC */
 //####################################################################################
@@ -8,6 +9,7 @@
 #include <RTClib.h>
 #include <RTC_DS3231.h>
 #include <TimeLord.h>
+#include <RWC_RGBW.h>
 
 TimeLord tardis;
 RTC_DS3231 RTC;
@@ -50,29 +52,6 @@ byte r = 0, g = 0, b = 0, w = 0,
      intensity = 100;  // 100 is max
 
 unsigned long msec_tgt = 1000;  // make this higher to slow down
-
-#define evening      0,   0,   0,  75
-#define night        0,   0,  10,   0
-#define morning      0,   0,   0, 100
-#define white_full 255, 147,  25, 255
-#define white        0,   0,   0, 255
-#define white_dim    0,   0,   0,   5
-#define white_deck   0,   0,   0,  75
-#define pink       255,   0, 100,  10
-#define red        255,   0,   0,   0
-#define green        0, 255,   0,   0
-#define blue         0,   0, 255,   0
-#define light_blue  10,  10, 255,  40
-#define ice_blue    52, 148, 209,   0
-#define nice_blue    0,  90, 135,  27
-#define rose       147,  42,  42,   0 // lots of strobe
-#define purple     200,   0, 255,   0
-#define brown2     139,  69,  19,   0
-#define brown3     139,  80,  14,   0
-#define orange     250,  40,   0,   0
-#define yellow     255, 150,   0,   0
-#define off          0,   0,   0,   0
-
 
 //####################################################################################
 // SETUP
@@ -175,7 +154,7 @@ void loop() {
     if (NowMinute <= WakeMinute && NowMinute <= MorningEndMinute) 
         {fadeto(night, intensity);} // color in the very early morning
     else if (NowMinute >= WakeMinute && NowMinute <= MorningEndMinute)     
-        {fadeto(nice_blue, intensity);} // color I wake to, if I wake before sunrise
+        {fadeto(nice_blue_1, intensity);} // color I wake to, if I wake before sunrise
     else if (NowMinute >= MorningEndMinute && NowMinute <= DayEndMinute)
         {fadeto(off, 0);} // color during daylight hours
     else (fadeto(evening, intensity)) // color from 1 hour before sunset to midnight
