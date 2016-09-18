@@ -11,6 +11,7 @@
 #include <TimeLord.h>
 #include <RWC_RGBW.h>
 
+
 TimeLord tardis;
 RTC_DS3231 RTC;
 
@@ -58,7 +59,7 @@ unsigned long msec_tgt = 1000;  // make this higher to slow down
 //####################################################################################
 void setup() {
 
-  Serial.begin(57600);
+  Serial.begin(9600);
 
   pinMode(RTC_SQW_IN, INPUT);
   
@@ -74,7 +75,7 @@ void setup() {
 
    //-------- sunrise sunset stuff ------
 
-  tardis.TimeZone(-5 * 60); // tell TimeLord what timezone your RTC is synchronized to. You can ignore DST
+  tardis.TimeZone(-4 * 60); // tell TimeLord what timezone your RTC is synchronized to. You can ignore DST
   // as long as the RTC never changes back and forth between DST and non-DST
   tardis.Position(LATITUDE, LONGITUDE); // tell TimeLord where in the world we are
   
@@ -146,28 +147,38 @@ void loop() {
 
     int WakeMinute = 5 * 60 + 30; // 5:30 AM
         // Morning ends 30 minutes past sunrise, which may be before I wake.
-    int MorningEndMinute = SunRiseMinuteOfDay + 60;
+    int MorningEndMinute = SunRiseMinuteOfDay + 120;
         // Day ends 30 minutes before sunset 
-    int DayEndMinute = SunSetMinuteOfDay - 60;
-    
+    int DayEndMinute = SunSetMinuteOfDay - 120;
 
+// #include st_patricks.h
+     
     if (NowMinute <= WakeMinute && NowMinute <= MorningEndMinute) 
-        {fadeto(night, intensity);} // color in the very early morning
+        {fadeto(night);} // color in the very early morning
     else if (NowMinute >= WakeMinute && NowMinute <= MorningEndMinute)     
-        {fadeto(nice_blue_1, intensity);} // color I wake to, if I wake before sunrise
+        {fadeto(morning);} // color I wake to, if I wake before sunrise
     else if (NowMinute >= MorningEndMinute && NowMinute <= DayEndMinute)
-        {fadeto(off, 0);} // color during daylight hours
-    else (fadeto(evening, intensity)) // color from 1 hour before sunset to midnight
-      ;
+        {fadeto(daylight);} // color during daylight hours
+    else (fadeto(evening)) // color from 1 hour before sunset to midnight
+//     else (july4th()) // color from 1 hour before sunset to midnight
+     ;
 //*
     Serial.print("Wake Time ");
     Serial.print(int(WakeMinute / 60));
     Serial.print(":");
     Serial.println(WakeMinute % 60);
+    Serial.print("Sunrise ");
+    Serial.print(int(SunRiseMinuteOfDay / 60));
+    Serial.print(":");
+    Serial.println(SunRiseMinuteOfDay % 60);
     Serial.print("Morning End ");
     Serial.print(int(MorningEndMinute / 60));
     Serial.print(":");
     Serial.println(MorningEndMinute % 60);
+    Serial.print("Sunset ");
+    Serial.print(int(SunSetMinuteOfDay / 60));
+    Serial.print(":");
+    Serial.println(SunSetMinuteOfDay % 60);
     Serial.print("Day End ");
     Serial.print(int(DayEndMinute / 60));
     Serial.print(":");
@@ -264,16 +275,16 @@ void deck_light(){
   }
 
 void work_light(){
-  set_string(white_full);
+  set_string(white_cool);
   }
 
 void christmas (){
-  fadeto(white_deck, intensity );
+  fadeto(white_deck  );
   delay(3000);
-  fadeto(red, 40);
+  fadeto(red);
   delay(3000);
-  fadeto(white_deck, intensity );
-  fadeto(green, 30 );
+  fadeto(white_deck  );
+  fadeto(green );
   delay(3000);
   }
 
@@ -287,30 +298,30 @@ void  halloween () {
   }
 
 void july4th() {
-  fadeto(white_deck, 100);
+  fadeto(red_4th);
+  delay(1500);
+  fadeto(white_4th);
   delay(3000);
-  fadeto(red, 100);
-  delay(1000);
-  fadeto(white_full, 30);
-  delay(1000);
-  fadeto(blue, 100);
-  delay(1000);
+  fadeto(blue);
+  delay(2000);
+  fadeto(white_4th);
+//  fadeto(evening);
   }
 
 void rgb(){
-  fadeto(white_deck, intensity);
+  fadeto(white_deck);
   delay(3000);
-  fadeto(red, intensity);
+  fadeto(red);
   delay(100);
-  fadeto(white_deck, intensity);
-  fadeto(green, intensity);
+  fadeto(white_deck);
+  fadeto(green);
   delay(100);
-  fadeto(white_deck, intensity);
-  fadeto(blue, intensity);
+  fadeto(white_deck);
+  fadeto(blue);
   delay(100);
   }
 
-void set_string (byte r, byte g, byte b, byte w ){
+void set_string (byte r, byte g, byte b, byte w, float intensity ){
   analogWrite(REDPIN, r );
   analogWrite(GREENPIN, g );
   analogWrite(BLUEPIN, b );
