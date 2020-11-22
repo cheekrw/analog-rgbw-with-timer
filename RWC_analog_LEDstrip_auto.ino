@@ -1,4 +1,9 @@
 
+
+
+// This works on ProTinket 5V 16MHz FTDI
+
+
 //####################################################################################
 /* Setup the RTC */
 //####################################################################################
@@ -6,10 +11,11 @@
 // and TimeLord stuff calculates sunrise and sunset times for each day
 
 #include <Wire.h>
-#include <RTClib.h>
+//#include <RTClib.h>
 #include <RTC_DS3231.h>
 #include <TimeLord.h>
 #include <RWC_RGBW.h>
+
 
 
 TimeLord tardis;
@@ -120,7 +126,7 @@ void loop() {
 //  work_light();
 //  rgb();
 //  set_string(evening);
-//  christmas();
+//  christmas(); // uncomment out the 60000 delay below
 //  halloween();
 //  july4th();
 
@@ -151,15 +157,18 @@ void loop() {
         // Day ends 30 minutes before sunset 
     int DayEndMinute = SunSetMinuteOfDay - 120;
 
-// #include st_patricks.h
-     
+// comment this out to make it regular colors again    
+// #include "st_patricks.h"
+
+//*
     if (NowMinute <= WakeMinute && NowMinute <= MorningEndMinute) 
-        {fadeto(night);} // color in the very early morning
+        {fadeto(christmas);} // color in the very early morning
     else if (NowMinute >= WakeMinute && NowMinute <= MorningEndMinute)     
         {fadeto(morning);} // color I wake to, if I wake before sunrise
     else if (NowMinute >= MorningEndMinute && NowMinute <= DayEndMinute)
         {fadeto(daylight);} // color during daylight hours
-    else (fadeto(evening)) // color from 1 hour before sunset to midnight
+    else (fadeto(RWC_deck)) // color from 1 hour before sunset to midnight
+//*/
 //     else (july4th()) // color from 1 hour before sunset to midnight
      ;
 //*
@@ -184,7 +193,7 @@ void loop() {
     Serial.print(":");
     Serial.println(DayEndMinute % 60);
 //*
-    
+  
 //*  RTC.forceTempConv(true);  //DS3231 does this every 64 seconds, we are simply testing the function here
     int16_t temp_word = RTC.getTempAsWord();
     int8_t temp_hbyte = temp_word >> 8;
@@ -210,7 +219,7 @@ void loop() {
     
     Serial.println();
 //*/
-  }
+ }
 
     times_up = false;
     delay(60000);
@@ -351,4 +360,3 @@ void fadeto (byte r_new, byte g_new, byte b_new, byte w_new, float intensity ){
     msec_ratio = msec_delta / msec_tgt;
   }
 }
-
